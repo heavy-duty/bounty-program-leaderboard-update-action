@@ -1,0 +1,5 @@
+name: "Update leaderboard issue"
+description: "Get all issues and create/update the leaderboard issue of the repo"
+runs:
+  using: "node16"
+  main: "index.js"
