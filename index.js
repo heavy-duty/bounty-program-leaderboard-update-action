@@ -31,7 +31,7 @@ const getIssuesPagingUpgrade = async (restApi) => {
       page: i,
       per_page: 100,
     });
-    console.log("RESPONSE: ", response);
+
     if (response.data === null || response.data.length === 0) {
       break;
     }
@@ -55,6 +55,82 @@ const getIssuesPagingUpgrade = async (restApi) => {
   return issues.reverse();
 };
 
+const getBountiesLeaderboard = (issues) => {
+  // Create two dic one (1) `points: [user]` and the other dict two (2) `user: currentPoint` (LookUp Table)
+  const dictOne = {};
+  const dictTwo = {};
+
+  issues.forEach((issue, index) => {
+    // For each issue, get user and issuePoints and search in dic (2) if the issue owner already exist:
+    const user = issue.labels
+      .filter((label) => label.name.includes("user:"))[0]
+      .name.split(":")[1];
+    const issuesPoints = Number(
+      issue.labels
+        .filter((label) => label.name.includes("points:"))[0]
+        .name.split(":")[1]
+    );
+
+    /**  
+      if not exist:
+      -> then
+      ---- we add a new entry at dict two (2) user: issuesPoints
+      ---- we add a new entry at dic one (1) using the issuesPoints to find the spot // END
+      */
+    if (!dictTwo[user]) {
+      dictTwo[user] = issuesPoints;
+      dictOne[issuesPoints] = [user];
+      return;
+    }
+
+    /**
+       if exist:
+      -> then 
+      ---- remove the user from his current position at dic one (1) and delete the key if value is empty -> []
+      ---- get new user points
+      ---- add new entry (or update the current one) using the new user points to the dic one (1)
+      ---- update the user current points at dict two (2) // END
+       */
+
+    const userCurrentPoints = dictTwo[user];
+    const usersXRewardIndex = dictOne[userCurrentPoints].indexOf(user);
+
+    dictOne[userCurrentPoints].splice(usersXRewardIndex, 1);
+
+    if (dictOne[userCurrentPoints].length === 0)
+      delete dictOne[userCurrentPoints];
+
+    const newReward = userCurrentPoints + issuesPoints;
+
+    dictOne[newReward] = [...(dictOne[newReward] ?? []), user];
+    dictTwo[user] = newReward;
+    return;
+  });
+
+  // now, we create the leaderboard, using the dict one (1)
+  const sortedLeaderboardKeys = Object.keys(dictOne).sort(
+    (a, b) => Number(b) - Number(a)
+  );
+  const leaderBoard = [];
+  sortedLeaderboardKeys.forEach((points) => {
+    dictOne[points].forEach((user) => {
+      leaderBoard.push({
+        user: {
+          login: user,
+          university: "testing",
+        },
+        points: Number(points),
+      });
+    });
+  });
+
+  const leaderboardJsonString = JSON.stringify(leaderBoard);
+
+  console.log(leaderBoard, "\n", leaderboardJsonString, "\n\n");
+
+  return leaderboardJsonString;
+};
+
 async function run() {
   try {
     console.log("Welcome to the github-action");
@@ -69,8 +145,9 @@ async function run() {
     );
 
     const issues = await getIssuesPagingUpgrade(restApi);
+    const leaderboardJsonString = getBountiesLeaderboard(issues);
 
-    console.log("ISSUES ->", issues);
+    console.log("JSON -->", leaderboardJsonString);
   } catch (error) {
     core.setFailed(error.message);
   }
