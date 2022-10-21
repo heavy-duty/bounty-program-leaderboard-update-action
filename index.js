@@ -159,7 +159,7 @@ async function run() {
     });
     console.log("CHECKPOINT ->", leaderboardIssue);
     if (leaderboardIssue.data.length > 0) {
-      await restApi.issues.listForRepo({
+      await restApi.issues.update({
         owner: githubOwner,
         repo: githubRepo,
         issue_number: leaderboardIssue.data[0].id,
