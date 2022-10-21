@@ -31,7 +31,7 @@ const getIssuesPagingUpgrade = async (restApi) => {
       page: i,
       per_page: 100,
     });
-    console.log("RESPONSE: ", respose);
+    console.log("RESPONSE: ", response);
     if (response.data === null || response.data.length === 0) {
       break;
     }
