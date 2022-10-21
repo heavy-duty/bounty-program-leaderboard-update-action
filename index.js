@@ -11,9 +11,9 @@ const authenticateGithubApp = async (
     appId: GITHUB_APP_ID,
     privateKey: JSON.parse(GITHUB_PRIVATE_KEY),
   });
-  const octokit = await app.getInstallationOctokit(GITHUB_APP_INSTALLATION);
+  const octokitApp = await app.getInstallationOctokit(GITHUB_APP_INSTALLATION);
 
-  return octokit.rest;
+  return octokitApp.rest;
 };
 
 const getIssuesPagingUpgrade = async (restApi) => {
