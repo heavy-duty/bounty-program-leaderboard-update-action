@@ -126,8 +126,6 @@ const getBountiesLeaderboard = (issues) => {
 
   const leaderboardJsonString = JSON.stringify(leaderBoard);
 
-  console.log(leaderBoard, "\n", leaderboardJsonString, "\n\n");
-
   return leaderboardJsonString;
 };
 
@@ -146,6 +144,14 @@ async function run() {
 
     const issues = await getIssuesPagingUpgrade(restApi);
     const leaderboardJsonString = getBountiesLeaderboard(issues);
+
+    const response = await restApi.issues.create({
+      owner: "heavy-duty",
+      repo: "bounty-program-test",
+      title: "Current Leaderboard",
+      body: leaderboardJsonString,
+      labels: [`core:leaderboard`],
+    });
 
     console.log("JSON -->", leaderboardJsonString);
   } catch (error) {
