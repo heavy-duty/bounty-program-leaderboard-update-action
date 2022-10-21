@@ -1,5 +1,21 @@
 name: "Update leaderboard issue"
 description: "Get all issues and create/update the leaderboard issue of the repo"
+inputs:
+  github-app-id:
+    description: "Github app id"
+    required: true
+  github-private-key:
+    description: "Github private key"
+    required: true
+  github-app-installation:
+    description: "Github app installation"
+    required: true
+  github-owner:
+    description: "Github repo owner"
+    required: true
+  github-repo:
+    description: "Github repo name"
+    required: true
 runs:
   using: "node16"
   main: "index.js"
