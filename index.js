@@ -159,10 +159,11 @@ async function run() {
     });
     console.log("CHECKPOINT ->", leaderboardIssue);
     if (leaderboardIssue.data.length > 0) {
+      console.log("UPDATING ->", leaderboardIssue.data[0].number);
       await restApi.issues.update({
         owner: githubOwner,
         repo: githubRepo,
-        issue_number: leaderboardIssue.data[0].id,
+        issue_number: leaderboardIssue.data[0].number,
         body: leaderboardJsonString,
       });
     } else {
@@ -177,7 +178,7 @@ async function run() {
 
     console.log("JSON -->", leaderboardJsonString);
   } catch (error) {
-    core.setFailed(error.message);
+    core.setFailed("QUE PASO??", error.message);
   }
 }
 
