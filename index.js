@@ -16,7 +16,7 @@ const authenticateGithubApp = async (
   return octokitApp.rest;
 };
 
-const getIssuesPagingUpgrade = async (restApi) => {
+const getIssuesPagingUpgrade = async (restApi, githubOwner, githubRepo) => {
   let response = null;
   const per_page = 100;
   const paginated_data = [];
@@ -25,8 +25,8 @@ const getIssuesPagingUpgrade = async (restApi) => {
   restApi;
   for (i; i < MAX_PAGES; i++) {
     response = await restApi.issues.listForRepo({
-      owner: "heavy-duty",
-      repo: "bounty-program-test",
+      owner: githubOwner,
+      repo: githubRepo,
       labels: `challenge`,
       page: i,
       per_page: 100,
@@ -135,6 +135,8 @@ async function run() {
     const githubAppId = core.getInput("github-app-id");
     const githubPrivateKey = core.getInput("github-private-key");
     const githubAppInstallation = core.getInput("github-app-installation");
+    const githubOwner = core.getInput("github-owner");
+    const githubRepo = core.getInput("github-repo");
 
     const restApi = await authenticateGithubApp(
       githubAppId,
@@ -142,16 +144,36 @@ async function run() {
       githubAppInstallation
     );
 
-    const issues = await getIssuesPagingUpgrade(restApi);
+    const issues = await getIssuesPagingUpgrade(
+      restApi,
+      githubOwner,
+      githubRepo
+    );
     const leaderboardJsonString = getBountiesLeaderboard(issues);
-
-    const response = await restApi.issues.create({
-      owner: "heavy-duty",
-      repo: "bounty-program-test",
-      title: "Current Leaderboard",
-      body: leaderboardJsonString,
-      labels: [`core:leaderboard`],
+    console.log("EPA EPA");
+    const leaderboardIssue = await restApi.issues.listForRepo({
+      owner: githubOwner,
+      repo: githubRepo,
+      labels: `core:leaderboard`,
+      state: "open",
     });
+    console.log("CHECKPOINT ->", leaderboardIssue);
+    if (leaderboardIssue.data.length > 0) {
+      await restApi.issues.listForRepo({
+        owner: githubOwner,
+        repo: githubRepo,
+        issue_number: leaderboardIssue.data[0].id,
+        body: leaderboardJsonString,
+      });
+    } else {
+      await restApi.issues.create({
+        owner: githubOwner,
+        repo: githubRepo,
+        title: "Current Leaderboard",
+        body: leaderboardJsonString,
+        labels: [`core:leaderboard`],
+      });
+    }
 
     console.log("JSON -->", leaderboardJsonString);
   } catch (error) {
