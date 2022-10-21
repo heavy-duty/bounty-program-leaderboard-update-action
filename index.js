@@ -22,16 +22,16 @@ const getIssuesPagingUpgrade = async (restApi) => {
   const paginated_data = [];
   const MAX_PAGES = 10;
   let i = 1;
-  const githuRestApi = restApi;
+  restApi;
   for (i; i < MAX_PAGES; i++) {
-    response = await githuRestApi.issues.listForRepo({
+    response = await restApi.issues.listForRepo({
       owner: "heavy-duty",
-      repo: "lisboa-bounty-program",
+      repo: "bounty-program-test",
       labels: `challenge`,
       page: i,
       per_page: 100,
     });
-
+    console.log("RESPONSE: ", respose);
     if (response.data === null || response.data.length === 0) {
       break;
     }
@@ -43,7 +43,7 @@ const getIssuesPagingUpgrade = async (restApi) => {
   }
 
   if (paginated_data.length == 0) {
-    console.log(`i got nuthn for you..`);
+    console.log(`i got nuthn for you 2..`);
     return null;
   }
 
