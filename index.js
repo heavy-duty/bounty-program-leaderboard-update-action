@@ -27,7 +27,7 @@ const getIssuesPagingUpgrade = async (restApi, githubOwner, githubRepo) => {
     response = await restApi.issues.listForRepo({
       owner: githubOwner,
       repo: githubRepo,
-      labels: `challenge`,
+      labels: `challenge,completed`,
       page: i,
       per_page: 100,
     });
