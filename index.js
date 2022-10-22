@@ -115,10 +115,7 @@ const getBountiesLeaderboard = (issues) => {
   sortedLeaderboardKeys.forEach((points) => {
     dictOne[points].forEach((user) => {
       leaderBoard.push({
-        user: {
-          login: user,
-          university: "testing",
-        },
+        user,
         points: Number(points),
       });
     });
