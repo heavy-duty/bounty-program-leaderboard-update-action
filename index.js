@@ -125,7 +125,7 @@ const getBountiesLeaderboard = async (issues) => {
       (challenge) => challenge.id === challengeId
     );
 
-    console.log("DATA CHALLENGE ", currentChallenge);
+    console.log("DATA CHALLENGE checkpoint");
     /**  
       if not exist:
       -> then
@@ -137,7 +137,7 @@ const getBountiesLeaderboard = async (issues) => {
       pointsAndUsers[issuesPoints] = [user];
       return;
     }
-
+    console.log("DATA CHALLENGE checkpoint 2");
     /**
        if exist:
       -> then 
@@ -155,7 +155,7 @@ const getBountiesLeaderboard = async (issues) => {
     // if the points X is empty (no user at it) with delete that entry
     if (pointsAndUsers[userCurrentPoints].length === 0)
       delete pointsAndUsers[userCurrentPoints];
-
+    console.log("DATA CHALLENGE checkpoint 3");
     const bonusPoints = getChallengeBonus(currentChallenge, userSubmissionDate);
     console.log("BONUS POINTS", bonusPoints);
     const newReward = userCurrentPoints + issuesPoints + bonusPoints;
@@ -229,7 +229,7 @@ async function run() {
       });
     }
 
-    console.log("JSON 24 -->", leaderboardJsonString);
+    console.log("JSON 25 -->", leaderboardJsonString);
   } catch (error) {
     core.setFailed("QUE PASO??", error.message);
   }
