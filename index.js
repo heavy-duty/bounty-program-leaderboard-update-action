@@ -16,13 +16,46 @@ const authenticateGithubApp = async (
   return octokitApp.rest;
 };
 
+const getChallenges = async () => {
+  console.log("epale");
+  const challenges = await fetch(
+    "https://lisbon.heavyduty.builders/api/challenges"
+  );
+
+  console.log("CHALLENGES", challenges.json());
+};
+
+const getChallengeProgress = (challenge) => {
+  const now = new Date(Date.now());
+  const startDate = new Date(challenge.startDate);
+  const endDate = new Date(challenge.endDate);
+
+  if (now.getTime() < startDate.getTime()) {
+    return 0;
+  } else if (now.getTime() < endDate.getTime()) {
+    const total = endDate.getTime() - startDate.getTime();
+    const elapsed = now.getTime() - startDate.getTime();
+
+    return Math.floor((elapsed / total) * 100);
+  } else {
+    return 100;
+  }
+};
+
+const getChallengeBonus = (challenge) => {
+  const maxBonus = challenge.rewardValue * (TIME_REWARD_PERCENTAGE / 100);
+  const progress = getChallengeProgress(challenge);
+
+  return Math.floor(maxBonus * (progress / 100));
+};
+
 const getIssuesPagingUpgrade = async (restApi, githubOwner, githubRepo) => {
   let response = null;
   const per_page = 100;
   const paginated_data = [];
   const MAX_PAGES = 10;
   let i = 1;
-  restApi;
+
   for (i; i < MAX_PAGES; i++) {
     response = await restApi.issues.listForRepo({
       owner: githubOwner,
@@ -56,9 +89,9 @@ const getIssuesPagingUpgrade = async (restApi, githubOwner, githubRepo) => {
 };
 
 const getBountiesLeaderboard = (issues) => {
-  // Create two dic one (1) `points: [user]` and the other dict two (2) `user: currentPoint` (LookUp Table)
-  const dictOne = {};
-  const dictTwo = {};
+  // Create two dic one [pointsAndUsers] (1) `points: [user]` and the other dict two [userLookupTable] (2) `user: currentPoint` (LookUp Table)
+  const pointsAndUsers = {};
+  const userLookupTable = {};
 
   issues.forEach((issue, index) => {
     // For each issue, get user and issuePoints and search in dic (2) if the issue owner already exist:
@@ -74,46 +107,50 @@ const getBountiesLeaderboard = (issues) => {
     /**  
       if not exist:
       -> then
-      ---- we add a new entry at dict two (2) user: issuesPoints
-      ---- we add a new entry at dic one (1) using the issuesPoints to find the spot // END
+      ---- we add a new entry at dict two [userLookupTable] (2) user: issuesPoints
+      ---- we add a new entry at dic one [pointsAndUsers] (1) using the issuesPoints to find the spot // END
       */
-    if (!dictTwo[user]) {
-      dictTwo[user] = issuesPoints;
-      dictOne[issuesPoints] = [user];
+    if (!userLookupTable[user]) {
+      userLookupTable[user] = issuesPoints;
+      pointsAndUsers[issuesPoints] = [user];
       return;
     }
 
     /**
        if exist:
       -> then 
-      ---- remove the user from his current position at dic one (1) and delete the key if value is empty -> []
+      ---- remove the user from his current position at dic one [pointsAndUsers] (1) and delete the key if value is empty -> []
       ---- get new user points
-      ---- add new entry (or update the current one) using the new user points to the dic one (1)
-      ---- update the user current points at dict two (2) // END
+      ---- add new entry (or update the current one) using the new user points to the dic one [pointsAndUsers] (1)
+      ---- update the user current points at dict two [userLookupTable] (2) // END
        */
 
-    const userCurrentPoints = dictTwo[user];
-    const usersXRewardIndex = dictOne[userCurrentPoints].indexOf(user);
+    const userCurrentPoints = userLookupTable[user];
+    const usersXRewardIndex = pointsAndUsers[userCurrentPoints].indexOf(user);
 
-    dictOne[userCurrentPoints].splice(usersXRewardIndex, 1);
+    pointsAndUsers[userCurrentPoints].splice(usersXRewardIndex, 1);
 
-    if (dictOne[userCurrentPoints].length === 0)
-      delete dictOne[userCurrentPoints];
+    // if the points X is empty (no user at it) with delete that entry
+    if (pointsAndUsers[userCurrentPoints].length === 0)
+      delete pointsAndUsers[userCurrentPoints];
 
-    const newReward = userCurrentPoints + issuesPoints;
+    //const bonusPoints = getChallengeBonus({});
+    const bonusPoints = 0;
 
-    dictOne[newReward] = [...(dictOne[newReward] ?? []), user];
-    dictTwo[user] = newReward;
+    const newReward = userCurrentPoints + issuesPoints + bonusPoints;
+
+    pointsAndUsers[newReward] = [...(pointsAndUsers[newReward] ?? []), user];
+    userLookupTable[user] = newReward;
     return;
   });
 
   // now, we create the leaderboard, using the dict one (1)
-  const sortedLeaderboardKeys = Object.keys(dictOne).sort(
+  const sortedLeaderboardKeys = Object.keys(pointsAndUsers).sort(
     (a, b) => Number(b) - Number(a)
   );
   const leaderBoard = [];
   sortedLeaderboardKeys.forEach((points) => {
-    dictOne[points].forEach((user) => {
+    pointsAndUsers[points].forEach((user) => {
       leaderBoard.push({
         user,
         points: Number(points),
@@ -129,6 +166,8 @@ const getBountiesLeaderboard = (issues) => {
 async function run() {
   try {
     console.log("Welcome to the github-action");
+    console.log("TESTING");
+    getChallenges();
     const githubAppId = core.getInput("github-app-id");
     const githubPrivateKey = core.getInput("github-private-key");
     const githubAppInstallation = core.getInput("github-app-installation");
@@ -147,16 +186,15 @@ async function run() {
       githubRepo
     );
     const leaderboardJsonString = getBountiesLeaderboard(issues);
-    console.log("EPA EPA");
+
     const leaderboardIssue = await restApi.issues.listForRepo({
       owner: githubOwner,
       repo: githubRepo,
       labels: `core:leaderboard`,
       state: "open",
     });
-    console.log("CHECKPOINT ->", leaderboardIssue);
+
     if (leaderboardIssue.data.length > 0) {
-      console.log("UPDATING ->", leaderboardIssue.data[0].number);
       await restApi.issues.update({
         owner: githubOwner,
         repo: githubRepo,
