@@ -23,7 +23,9 @@ const getChallenges = async () => {
     "https://lisbon.heavyduty.builders/api/challenges"
   );
 
-  console.log("CHALLENGES", challenges.json());
+  const data = await challenges.json();
+
+  console.log("CHALLENGES 22", data);
 };
 
 const getChallengeProgress = (challenge) => {
