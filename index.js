@@ -1,6 +1,7 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
 const octokit = require("octokit");
+const fetch = require("node-fetch");
 
 const authenticateGithubApp = async (
   GITHUB_APP_ID,
