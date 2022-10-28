@@ -223,7 +223,7 @@ async function run() {
       });
     }
 
-    console.log("JSON  2-->", leaderboardJsonString);
+    console.log("JSON 23-->", leaderboardJsonString);
   } catch (error) {
     core.setFailed("QUE PASO??", error.message);
   }
