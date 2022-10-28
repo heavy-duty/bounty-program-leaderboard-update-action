@@ -29,8 +29,8 @@ const getChallenges = async () => {
 
 // now = from github issue
 // start and end = from challenges
-const getChallengeProgress = (challenge) => {
-  const now = new Date(Date.now());
+const getChallengeProgress = (challenge, userSubmissionDate) => {
+  const now = new Date(userSubmissionDate);
   const startDate = new Date(challenge.startDate);
   const endDate = new Date(challenge.endDate);
 
@@ -46,9 +46,9 @@ const getChallengeProgress = (challenge) => {
   }
 };
 
-const getChallengeBonus = (challenge) => {
+const getChallengeBonus = (challenge, userSubmissionDate) => {
   const maxBonus = challenge.rewardValue * (TIME_REWARD_PERCENTAGE / 100);
-  const progress = getChallengeProgress(challenge);
+  const progress = getChallengeProgress(challenge, userSubmissionDate);
 
   return Math.floor(maxBonus * (progress / 100));
 };
@@ -112,7 +112,14 @@ const getBountiesLeaderboard = async (issues) => {
       .filter((label) => label.name.includes("challengeId:"))[0]
       .name.split(":")[1];
 
-    console.log("CHALLENGE ID", challengeId);
+    const userSubmissionDate = issue.created_at;
+
+    console.log(
+      "CHALLENGE ID",
+      challengeId,
+      "User Submission",
+      userSubmissionDate
+    );
 
     const currentChallenge = challenges.find(
       (challenge) => challenge.id === challengeId
@@ -149,9 +156,8 @@ const getBountiesLeaderboard = async (issues) => {
     if (pointsAndUsers[userCurrentPoints].length === 0)
       delete pointsAndUsers[userCurrentPoints];
 
-    //const bonusPoints = getChallengeBonus({});
-    const bonusPoints = 0;
-
+    const bonusPoints = getChallengeBonus(currentChallenge, userSubmissionDate);
+    console.log("BONUS POINTS", bonusPoints);
     const newReward = userCurrentPoints + issuesPoints + bonusPoints;
 
     pointsAndUsers[newReward] = [...(pointsAndUsers[newReward] ?? []), user];
@@ -223,7 +229,7 @@ async function run() {
       });
     }
 
-    console.log("JSON 23-->", leaderboardJsonString);
+    console.log("JSON 24 -->", leaderboardJsonString);
   } catch (error) {
     core.setFailed("QUE PASO??", error.message);
   }
