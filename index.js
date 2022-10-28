@@ -23,7 +23,7 @@ const getChallenges = async () => {
     "https://lisbon.heavyduty.builders/api/challenges"
   );
 
-  const data = await challenges.json();
+  const data = challenges.json();
 
   console.log("CHALLENGES 22", data);
 };
@@ -170,7 +170,7 @@ async function run() {
   try {
     console.log("Welcome to the github-action");
     console.log("TESTING");
-    getChallenges();
+    await getChallenges();
     const githubAppId = core.getInput("github-app-id");
     const githubPrivateKey = core.getInput("github-private-key");
     const githubAppInstallation = core.getInput("github-app-installation");
