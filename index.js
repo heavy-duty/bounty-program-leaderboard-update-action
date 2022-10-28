@@ -24,8 +24,6 @@ const getChallenges = async () => {
 
   const data = await challenges.json();
 
-  console.log("CHALLENGES 3", data);
-
   return data;
 };
 
@@ -225,7 +223,7 @@ async function run() {
       });
     }
 
-    console.log("JSON -->", leaderboardJsonString);
+    console.log("JSON  2-->", leaderboardJsonString);
   } catch (error) {
     core.setFailed("QUE PASO??", error.message);
   }
