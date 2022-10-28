@@ -18,18 +18,19 @@ const authenticateGithubApp = async (
 };
 
 const getChallenges = async () => {
-  console.log("epale menor");
   const challenges = await fetch(
     "https://lisbon.heavyduty.builders/api/challenges"
   );
 
-  console.log("AJA Y AHORA?", challenges);
-
   const data = await challenges.json();
 
   console.log("CHALLENGES 3", data);
+
+  return data;
 };
 
+// now = from github issue
+// start and end = from challenges
 const getChallengeProgress = (challenge) => {
   const now = new Date(Date.now());
   const startDate = new Date(challenge.startDate);
@@ -93,10 +94,11 @@ const getIssuesPagingUpgrade = async (restApi, githubOwner, githubRepo) => {
   return issues.reverse();
 };
 
-const getBountiesLeaderboard = (issues) => {
+const getBountiesLeaderboard = async (issues) => {
   // Create two dic one [pointsAndUsers] (1) `points: [user]` and the other dict two [userLookupTable] (2) `user: currentPoint` (LookUp Table)
   const pointsAndUsers = {};
   const userLookupTable = {};
+  const challenges = await getChallenges();
 
   issues.forEach((issue, index) => {
     // For each issue, get user and issuePoints and search in dic (2) if the issue owner already exist:
@@ -108,7 +110,17 @@ const getBountiesLeaderboard = (issues) => {
         .filter((label) => label.name.includes("points:"))[0]
         .name.split(":")[1]
     );
+    const challengeId = issue.labels
+      .filter((label) => label.name.includes("challengeId:"))[0]
+      .name.split(":")[1];
 
+    console.log("CHALLENGE ID", challengeId);
+
+    const currentChallenge = challenges.find(
+      (challenge) => challenge.id === challengeId
+    );
+
+    console.log("DATA CHALLENGE ", currentChallenge);
     /**  
       if not exist:
       -> then
@@ -170,9 +182,6 @@ const getBountiesLeaderboard = (issues) => {
 
 async function run() {
   try {
-    console.log("Welcome to the github-action");
-    console.log("TESTING");
-    await getChallenges();
     const githubAppId = core.getInput("github-app-id");
     const githubPrivateKey = core.getInput("github-private-key");
     const githubAppInstallation = core.getInput("github-app-installation");
@@ -190,7 +199,7 @@ async function run() {
       githubOwner,
       githubRepo
     );
-    const leaderboardJsonString = getBountiesLeaderboard(issues);
+    const leaderboardJsonString = await getBountiesLeaderboard(issues);
 
     const leaderboardIssue = await restApi.issues.listForRepo({
       owner: githubOwner,
