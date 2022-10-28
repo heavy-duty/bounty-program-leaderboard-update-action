@@ -18,14 +18,16 @@ const authenticateGithubApp = async (
 };
 
 const getChallenges = async () => {
-  console.log("epale");
+  console.log("epale menor");
   const challenges = await fetch(
     "https://lisbon.heavyduty.builders/api/challenges"
   );
 
-  const data = challenges.json();
+  console.log("AJA Y AHORA?", challenges);
 
-  console.log("CHALLENGES 22", data);
+  const data = await challenges.json();
+
+  console.log("CHALLENGES 3", data);
 };
 
 const getChallengeProgress = (challenge) => {
