@@ -97,11 +97,12 @@ const getIssuesPagingUpgrade = async (restApi, githubOwner, githubRepo) => {
 };
 
 const getBountiesLeaderboard = async (issues) => {
+  console.log("Getting leaderboard star!");
   // Create two dic one [pointsAndUsers] (1) `points: [user]` and the other dict two [userLookupTable] (2) `user: currentPoint` (LookUp Table)
   const pointsAndUsers = {};
   const userLookupTable = {};
   const challenges = await getChallenges();
-
+  console.log("Challenges are here ->");
   issues.forEach((issue, index) => {
     // For each issue, get user and issuePoints and search in dic (2) if the issue owner already exist:
     const user = issue.labels
@@ -190,6 +191,7 @@ const getBountiesLeaderboard = async (issues) => {
 
 async function run() {
   try {
+    console.log("Entering github action");
     const githubAppId = core.getInput("github-app-id");
     const githubPrivateKey = core.getInput("github-private-key");
     const githubAppInstallation = core.getInput("github-app-installation");
