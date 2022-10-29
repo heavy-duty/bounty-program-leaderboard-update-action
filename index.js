@@ -3,6 +3,8 @@ const github = require("@actions/github");
 const octokit = require("octokit");
 const fetch = require("cross-fetch");
 
+const TIME_REWARD_PERCENTAGE = 20;
+
 const authenticateGithubApp = async (
   GITHUB_APP_ID,
   GITHUB_PRIVATE_KEY,
