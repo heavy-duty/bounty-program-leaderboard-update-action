@@ -152,7 +152,7 @@ const getChallengesLeaderboards = async (issues) => {
       //return;
       userFoundInLookupTable = false;
     }
-
+    console.log("Checkpoint 1");
     /**  
       if team not exist:
       -> then
@@ -166,7 +166,7 @@ const getChallengesLeaderboards = async (issues) => {
       //return;
       teamFoundInLookupTable = false;
     }
-
+    console.log("Checkpoint 2");
     /**
        if user exist:
       -> then 
@@ -191,6 +191,7 @@ const getChallengesLeaderboards = async (issues) => {
       pointsAndUsers[newReward] = [...(pointsAndUsers[newReward] ?? []), user];
       userLookupTable[user] = newReward;
     }
+    console.log("Checkpoint 3");
 
     /**
        if team exist:
@@ -215,6 +216,7 @@ const getChallengesLeaderboards = async (issues) => {
       pointsAndTeams[newReward] = [...(pointsAndTeams[newReward] ?? []), user];
       teamLookupTable[user] = newReward;
     }
+    console.log("Checkpoint 4");
 
     return;
   });
@@ -306,7 +308,7 @@ async function run() {
 
     console.log("JSON 26 -->", leaderboardJsonString);
   } catch (error) {
-    core.setFailed("QUE PASO??", error.message);
+    core.setFailed("QUE PASO??", error);
   }
 }
 
