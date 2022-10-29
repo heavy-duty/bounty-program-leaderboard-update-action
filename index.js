@@ -196,25 +196,25 @@ const getChallengesLeaderboards = async (issues) => {
     /**
        if team exist:
       -> then 
-      ---- remove the user from his current position at dic one [pointsAndTeams] (1) and delete the key if value is empty -> []
-      ---- get new user points
-      ---- add new entry (or update the current one) using the new user points to the dic one [pointsAndTeams] (1)
+      ---- remove the team from his current position at dic one [pointsAndTeams] (1) and delete the key if value is empty -> []
+      ---- get new team points
+      ---- add new entry (or update the current one) using the new team points to the dic one [pointsAndTeams] (1)
       ---- update the team current points at dict two [teamLookupTable] (2) // END
     */
     if (teamFoundInLookupTable) {
-      const teamCurrentPoints = teamLookupTable[user];
-      const teamXRewardIndex = pointsAndTeams[teamCurrentPoints].indexOf(user);
+      const teamCurrentPoints = teamLookupTable[team];
+      const teamXRewardIndex = pointsAndTeams[teamCurrentPoints].indexOf(team);
 
       pointsAndTeams[teamCurrentPoints].splice(teamXRewardIndex, 1);
 
-      // if the points X is empty (no user at it) with delete that entry
+      // if the points X is empty (no team at it) with delete that entry
       if (pointsAndTeams[teamCurrentPoints].length === 0)
         delete pointsAndTeams[teamCurrentPoints];
 
       const newReward = teamCurrentPoints + totalPoints;
 
-      pointsAndTeams[newReward] = [...(pointsAndTeams[newReward] ?? []), user];
-      teamLookupTable[user] = newReward;
+      pointsAndTeams[newReward] = [...(pointsAndTeams[newReward] ?? []), team];
+      teamLookupTable[team] = newReward;
     }
     console.log("Checkpoint 4");
 
