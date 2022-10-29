@@ -131,7 +131,7 @@ const getBountiesLeaderboard = async (issues) => {
     );
 
     const bonusPoints = getChallengeBonus(currentChallenge, userSubmissionDate);
-    console.log("BONUS POINTS", bonusPoints);
+    console.log("BONUS POINTS", bonusPoints, "ISSUESP POINTS", issuesPoints);
     const totalPoints = issuesPoints + bonusPoints;
 
     console.log("TOTAL POINTS ", bonusPoints);
@@ -145,7 +145,7 @@ const getBountiesLeaderboard = async (issues) => {
       */
     if (!userLookupTable[user]) {
       userLookupTable[user] = totalPoints;
-      pointsAndUsers[issuesPoints] = [user];
+      pointsAndUsers[totalPoints] = [user];
       return;
     }
     /**
