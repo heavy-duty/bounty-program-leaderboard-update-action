@@ -116,7 +116,9 @@ const getChallengesLeaderboards = async (issues) => {
     console.log("EPALEE!", teamLabel);
 
     // for get aonly new kind of issues (all issues have now a team label, if not, skip)
-    if (!teamLabel) return;
+    if (teamLabel.length === 0) return;
+
+    console.log("Checkpoint 1");
 
     const team = teamLabel[0].name.split(":")[1];
     // For each issue, get user and issuePoints and search in dic (2) if the issue owner already exist:
@@ -128,6 +130,7 @@ const getChallengesLeaderboards = async (issues) => {
         .filter((label) => label.name.includes("points:"))[0]
         .name.split(":")[1]
     );
+    console.log("Checkpoint 2");
     const challengeId = issue.labels
       .filter((label) => label.name.includes("challengeId:"))[0]
       .name.split(":")[1];
@@ -139,7 +142,7 @@ const getChallengesLeaderboards = async (issues) => {
     const currentChallenge = challenges.find(
       (challenge) => challenge.id === challengeId
     );
-
+    console.log("Checkpoint 3");
     const bonusPoints = getChallengeBonus(currentChallenge, submissionDate);
     console.log("BONUS POINTS", bonusPoints, "ISSUESP POINTS", issuesPoints);
     const totalPoints = issuesPoints + bonusPoints;
