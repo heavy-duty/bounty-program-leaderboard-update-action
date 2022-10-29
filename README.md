@@ -1,4 +1,4 @@
-# Hello world javascript action
+# Leaderboards update github action
 
 This action get all the issues and create a new leaderboard
 
