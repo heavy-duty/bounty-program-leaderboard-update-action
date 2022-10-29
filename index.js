@@ -125,6 +125,9 @@ const getBountiesLeaderboard = async (issues) => {
       (challenge) => challenge.id === challengeId
     );
 
+    const bonusPoints = getChallengeBonus(currentChallenge, userSubmissionDate);
+    console.log("BONUS POINTS", bonusPoints);
+
     console.log("DATA CHALLENGE checkpoint");
     /**  
       if not exist:
@@ -133,11 +136,10 @@ const getBountiesLeaderboard = async (issues) => {
       ---- we add a new entry at dic one [pointsAndUsers] (1) using the issuesPoints to find the spot // END
       */
     if (!userLookupTable[user]) {
-      userLookupTable[user] = issuesPoints;
+      userLookupTable[user] = issuesPoints + bonusPoints;
       pointsAndUsers[issuesPoints] = [user];
       return;
     }
-    console.log("DATA CHALLENGE checkpoint 2");
     /**
        if exist:
       -> then 
@@ -155,9 +157,7 @@ const getBountiesLeaderboard = async (issues) => {
     // if the points X is empty (no user at it) with delete that entry
     if (pointsAndUsers[userCurrentPoints].length === 0)
       delete pointsAndUsers[userCurrentPoints];
-    console.log("DATA CHALLENGE checkpoint 3");
-    const bonusPoints = getChallengeBonus(currentChallenge, userSubmissionDate);
-    console.log("BONUS POINTS", bonusPoints);
+
     const newReward = userCurrentPoints + issuesPoints + bonusPoints;
 
     pointsAndUsers[newReward] = [...(pointsAndUsers[newReward] ?? []), user];
