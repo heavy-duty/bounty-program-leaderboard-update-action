@@ -29,7 +29,7 @@ const getChallenges = async () => {
   return data;
 };
 
-export const getProgress = (min, max, value) => {
+const getProgress = (min, max, value) => {
   console.log("ENTER 2", min, max, value);
   if (value < min) {
     return 0;
