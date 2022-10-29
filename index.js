@@ -109,9 +109,11 @@ const getChallengesLeaderboards = async (issues) => {
   console.log("Challenges are here ->");
   issues.forEach((issue, index) => {
     // For each issue, get team and issuePoints and search in dic (2) if the issue owner already exist:
+    console.log("Testing", issue);
     const teamLabel = issue.labels.filter((label) =>
       label.name.includes("team:")
     );
+    console.log("EPALEE!", teamLabel);
 
     // for get aonly new kind of issues (all issues have now a team label, if not, skip)
     if (!teamLabel) return;
