@@ -109,9 +109,14 @@ const getChallengesLeaderboards = async (issues) => {
   console.log("Challenges are here ->");
   issues.forEach((issue, index) => {
     // For each issue, get team and issuePoints and search in dic (2) if the issue owner already exist:
-    const team = issue.labels
-      .filter((label) => label.name.includes("team:"))[0]
-      .name.split(":")[1];
+    const teamLabel = issue.labels.filter((label) =>
+      label.name.includes("team:")
+    );
+
+    // for get aonly new kind of issues (all issues have now a team label, if not, skip)
+    if (!teamLabel) return;
+
+    const team = teamLabel[0].name.split(":")[1];
     // For each issue, get user and issuePoints and search in dic (2) if the issue owner already exist:
     const user = issue.labels
       .filter((label) => label.name.includes("user:"))[0]
@@ -239,7 +244,7 @@ const getChallengesLeaderboards = async (issues) => {
     });
   });
 
-  leaderboardJsonString.users = JSON.stringify(usersLeaderBoard);
+  leaderboardJsonString.users = usersLeaderBoard;
 
   // FOR TEAMS now, we create the single leaderboard, using the dict one (1)
   const sortedTeamsLeaderboardKeys = Object.keys(pointsAndTeams).sort(
@@ -255,7 +260,7 @@ const getChallengesLeaderboards = async (issues) => {
     });
   });
 
-  leaderboardJsonString.teams = JSON.stringify(teamsLeaderBoard);
+  leaderboardJsonString.teams = teamsLeaderBoard;
 
   return JSON.stringify(leaderboardJsonString);
 };
