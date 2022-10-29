@@ -84,8 +84,8 @@ const getIssuesPagingUpgrade = async (restApi, githubOwner, githubRepo) => {
   }
 
   if (paginated_data.length == 0) {
-    console.log(`i got nuthn for you 2..`);
-    return null;
+    console.log(`i got nuthn for you..`);
+    return [];
   }
 
   const issues = paginated_data;
@@ -132,6 +132,9 @@ const getBountiesLeaderboard = async (issues) => {
 
     const bonusPoints = getChallengeBonus(currentChallenge, userSubmissionDate);
     console.log("BONUS POINTS", bonusPoints);
+    const totalPoints = issuesPoints + bonusPoints;
+
+    console.log("TOTAL POINTS ", bonusPoints);
 
     console.log("DATA CHALLENGE checkpoint");
     /**  
@@ -141,7 +144,7 @@ const getBountiesLeaderboard = async (issues) => {
       ---- we add a new entry at dic one [pointsAndUsers] (1) using the issuesPoints to find the spot // END
       */
     if (!userLookupTable[user]) {
-      userLookupTable[user] = issuesPoints + bonusPoints;
+      userLookupTable[user] = totalPoints;
       pointsAndUsers[issuesPoints] = [user];
       return;
     }
@@ -163,7 +166,7 @@ const getBountiesLeaderboard = async (issues) => {
     if (pointsAndUsers[userCurrentPoints].length === 0)
       delete pointsAndUsers[userCurrentPoints];
 
-    const newReward = userCurrentPoints + issuesPoints + bonusPoints;
+    const newReward = userCurrentPoints + totalPoints;
 
     pointsAndUsers[newReward] = [...(pointsAndUsers[newReward] ?? []), user];
     userLookupTable[user] = newReward;
