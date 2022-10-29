@@ -29,19 +29,13 @@ const getChallenges = async () => {
   return data;
 };
 
-// now = from github issue
-// start and end = from challenges
-const getChallengeProgress = (challenge, userSubmissionDate) => {
-  console.log("ENTER 2", challenge, userSubmissionDate);
-  const now = new Date(userSubmissionDate);
-  const startDate = new Date(challenge.startDate);
-  const endDate = new Date(challenge.endDate);
-  console.log("ENTER 2-1", challenge, userSubmissionDate);
-  if (now.getTime() < startDate.getTime()) {
+export const getProgress = (min, max, value) => {
+  console.log("ENTER 2", min, max, value);
+  if (value < min) {
     return 0;
-  } else if (now.getTime() < endDate.getTime()) {
-    const total = endDate.getTime() - startDate.getTime();
-    const elapsed = now.getTime() - startDate.getTime();
+  } else if (value < max) {
+    const total = max - min;
+    const elapsed = value - min;
 
     return Math.floor((elapsed / total) * 100);
   } else {
@@ -52,9 +46,15 @@ const getChallengeProgress = (challenge, userSubmissionDate) => {
 const getChallengeBonus = (challenge, userSubmissionDate) => {
   console.log("ENTER 1", challenge, userSubmissionDate);
   const maxBonus = challenge.rewardValue * (TIME_REWARD_PERCENTAGE / 100);
-  const progress = getChallengeProgress(challenge, userSubmissionDate);
+  const progressLeft =
+    100 -
+    getProgress(
+      new Date(challenge.startDate).getTime(),
+      new Date(challenge.endDate).getTime(),
+      new Date(userSubmissionDate).getTime()
+    );
 
-  return Math.floor(maxBonus * (progress / 100));
+  return Math.floor(maxBonus * (progressLeft / 100));
 };
 
 const getIssuesPagingUpgrade = async (restApi, githubOwner, githubRepo) => {
