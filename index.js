@@ -96,14 +96,22 @@ const getIssuesPagingUpgrade = async (restApi, githubOwner, githubRepo) => {
   return issues.reverse();
 };
 
-const getBountiesLeaderboard = async (issues) => {
-  console.log("Getting leaderboard star!");
+const getChallengesLeaderboards = async (issues) => {
+  console.log("Getting single leaderboard star!");
   // Create two dic one [pointsAndUsers] (1) `points: [user]` and the other dict two [userLookupTable] (2) `user: currentPoint` (LookUp Table)
   const pointsAndUsers = {};
   const userLookupTable = {};
+  // Create two dic one [pointsAndTeams] (1) `points: [team]` and the other dict two [teamLookupTable] (2) `team: currentPoint` (LookUp Table)
+  const pointsAndTeams = {};
+  const teamLookupTable = {};
+
   const challenges = await getChallenges();
   console.log("Challenges are here ->");
   issues.forEach((issue, index) => {
+    // For each issue, get team and issuePoints and search in dic (2) if the issue owner already exist:
+    const team = issue.labels
+      .filter((label) => label.name.includes("team:"))[0]
+      .name.split(":")[1];
     // For each issue, get user and issuePoints and search in dic (2) if the issue owner already exist:
     const user = issue.labels
       .filter((label) => label.name.includes("user:"))[0]
@@ -117,79 +125,137 @@ const getBountiesLeaderboard = async (issues) => {
       .filter((label) => label.name.includes("challengeId:"))[0]
       .name.split(":")[1];
 
-    const userSubmissionDate = issue.created_at;
+    const submissionDate = issue.created_at;
 
-    console.log(
-      "CHALLENGE ID",
-      challengeId,
-      "User Submission",
-      userSubmissionDate
-    );
+    console.log("CHALLENGE ID", challengeId, "User Submission", submissionDate);
 
     const currentChallenge = challenges.find(
       (challenge) => challenge.id === challengeId
     );
 
-    const bonusPoints = getChallengeBonus(currentChallenge, userSubmissionDate);
+    const bonusPoints = getChallengeBonus(currentChallenge, submissionDate);
     console.log("BONUS POINTS", bonusPoints, "ISSUESP POINTS", issuesPoints);
     const totalPoints = issuesPoints + bonusPoints;
 
     console.log("TOTAL POINTS ", bonusPoints);
 
-    console.log("DATA CHALLENGE checkpoint");
     /**  
-      if not exist:
+      if user not exist:
       -> then
       ---- we add a new entry at dict two [userLookupTable] (2) user: issuesPoints
       ---- we add a new entry at dic one [pointsAndUsers] (1) using the issuesPoints to find the spot // END
-      */
+    */
+    let userFoundInLookupTable = true;
     if (!userLookupTable[user]) {
       userLookupTable[user] = totalPoints;
       pointsAndUsers[totalPoints] = [user];
-      return;
+      //return;
+      userFoundInLookupTable = false;
     }
+
+    /**  
+      if team not exist:
+      -> then
+      ---- we add a new entry at dict two [teamLookupTable] (2) team: issuesPoints
+      ---- we add a new entry at dic one [pointsAndTeams] (1) using the issuesPoints to find the spot // END
+    */
+    let teamFoundInLookupTable = true;
+    if (!teamLookupTable[team]) {
+      teamLookupTable[team] = totalPoints;
+      pointsAndTeams[totalPoints] = [team];
+      //return;
+      teamFoundInLookupTable = false;
+    }
+
     /**
-       if exist:
+       if user exist:
       -> then 
       ---- remove the user from his current position at dic one [pointsAndUsers] (1) and delete the key if value is empty -> []
       ---- get new user points
       ---- add new entry (or update the current one) using the new user points to the dic one [pointsAndUsers] (1)
       ---- update the user current points at dict two [userLookupTable] (2) // END
-       */
+    */
 
-    const userCurrentPoints = userLookupTable[user];
-    const usersXRewardIndex = pointsAndUsers[userCurrentPoints].indexOf(user);
+    if (userFoundInLookupTable) {
+      const userCurrentPoints = userLookupTable[user];
+      const usersXRewardIndex = pointsAndUsers[userCurrentPoints].indexOf(user);
 
-    pointsAndUsers[userCurrentPoints].splice(usersXRewardIndex, 1);
+      pointsAndUsers[userCurrentPoints].splice(usersXRewardIndex, 1);
 
-    // if the points X is empty (no user at it) with delete that entry
-    if (pointsAndUsers[userCurrentPoints].length === 0)
-      delete pointsAndUsers[userCurrentPoints];
+      // if the points X is empty (no user at it) with delete that entry
+      if (pointsAndUsers[userCurrentPoints].length === 0)
+        delete pointsAndUsers[userCurrentPoints];
 
-    const newReward = userCurrentPoints + totalPoints;
+      const newReward = userCurrentPoints + totalPoints;
 
-    pointsAndUsers[newReward] = [...(pointsAndUsers[newReward] ?? []), user];
-    userLookupTable[user] = newReward;
+      pointsAndUsers[newReward] = [...(pointsAndUsers[newReward] ?? []), user];
+      userLookupTable[user] = newReward;
+    }
+
+    /**
+       if team exist:
+      -> then 
+      ---- remove the user from his current position at dic one [pointsAndTeams] (1) and delete the key if value is empty -> []
+      ---- get new user points
+      ---- add new entry (or update the current one) using the new user points to the dic one [pointsAndTeams] (1)
+      ---- update the team current points at dict two [teamLookupTable] (2) // END
+    */
+    if (teamFoundInLookupTable) {
+      const teamCurrentPoints = teamLookupTable[user];
+      const teamXRewardIndex = pointsAndTeams[teamCurrentPoints].indexOf(user);
+
+      pointsAndTeams[teamCurrentPoints].splice(teamXRewardIndex, 1);
+
+      // if the points X is empty (no user at it) with delete that entry
+      if (pointsAndTeams[teamCurrentPoints].length === 0)
+        delete pointsAndTeams[teamCurrentPoints];
+
+      const newReward = teamCurrentPoints + totalPoints;
+
+      pointsAndTeams[newReward] = [...(pointsAndTeams[newReward] ?? []), user];
+      teamLookupTable[user] = newReward;
+    }
+
     return;
   });
 
-  // now, we create the leaderboard, using the dict one (1)
-  const sortedLeaderboardKeys = Object.keys(pointsAndUsers).sort(
+  let leaderboardJsonString = {
+    users: null,
+    teams: null,
+  };
+  // FOR USERS now, we create the single leaderboard, using the dict one (1)
+  const sortedUsersLeaderboardKeys = Object.keys(pointsAndUsers).sort(
     (a, b) => Number(b) - Number(a)
   );
-  const leaderBoard = [];
-  sortedLeaderboardKeys.forEach((points) => {
+  const usersLeaderBoard = [];
+  sortedUsersLeaderboardKeys.forEach((points) => {
     pointsAndUsers[points].forEach((user) => {
-      leaderBoard.push({
+      usersLeaderBoard.push({
         user,
         points: Number(points),
       });
     });
   });
 
-  const leaderboardJsonString = JSON.stringify(leaderBoard);
+  leaderboardJsonString.users = JSON.stringify(usersLeaderBoard);
 
-  return leaderboardJsonString;
+  // FOR TEAMS now, we create the single leaderboard, using the dict one (1)
+  const sortedTeamsLeaderboardKeys = Object.keys(pointsAndTeams).sort(
+    (a, b) => Number(b) - Number(a)
+  );
+  const teamsLeaderBoard = [];
+  sortedTeamsLeaderboardKeys.forEach((points) => {
+    pointsAndTeams[points].forEach((team) => {
+      teamsLeaderBoard.push({
+        team,
+        points: Number(points),
+      });
+    });
+  });
+
+  leaderboardJsonString.teams = JSON.stringify(teamsLeaderBoard);
+
+  return JSON.stringify(leaderboardJsonString);
 };
 
 async function run() {
@@ -212,7 +278,7 @@ async function run() {
       githubOwner,
       githubRepo
     );
-    const leaderboardJsonString = await getBountiesLeaderboard(issues);
+    const leaderboardJsonString = await getChallengesLeaderboards(issues);
 
     const leaderboardIssue = await restApi.issues.listForRepo({
       owner: githubOwner,
