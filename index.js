@@ -30,10 +30,11 @@ const getChallenges = async () => {
 // now = from github issue
 // start and end = from challenges
 const getChallengeProgress = (challenge, userSubmissionDate) => {
+  console.log("ENTER 2", challenge, userSubmissionDate);
   const now = new Date(userSubmissionDate);
   const startDate = new Date(challenge.startDate);
   const endDate = new Date(challenge.endDate);
-
+  console.log("ENTER 2-1", challenge, userSubmissionDate);
   if (now.getTime() < startDate.getTime()) {
     return 0;
   } else if (now.getTime() < endDate.getTime()) {
@@ -47,6 +48,7 @@ const getChallengeProgress = (challenge, userSubmissionDate) => {
 };
 
 const getChallengeBonus = (challenge, userSubmissionDate) => {
+  console.log("ENTER 1", challenge, userSubmissionDate);
   const maxBonus = challenge.rewardValue * (TIME_REWARD_PERCENTAGE / 100);
   const progress = getChallengeProgress(challenge, userSubmissionDate);
 
@@ -229,7 +231,7 @@ async function run() {
       });
     }
 
-    console.log("JSON 25 -->", leaderboardJsonString);
+    console.log("JSON 26 -->", leaderboardJsonString);
   } catch (error) {
     core.setFailed("QUE PASO??", error.message);
   }
