@@ -104,7 +104,7 @@ const getAllTeamsIssues = async (restApi) => {
     state: "open",
   });
 
-  return teams.data[0];
+  return teams.data;
 };
 
 const getChallengesLeaderboards = async (restApi, issues) => {
@@ -267,9 +267,11 @@ const getChallengesLeaderboards = async (restApi, issues) => {
   );
   const teamsLeaderBoard = [];
   sortedTeamsLeaderboardKeys.forEach((points) => {
-    pointsAndTeams[points].forEach((team) => {
+    pointsAndTeams[points].forEach((teamNumber) => {
+      const temp_team = teams.filter((team) => team.number === teamNumber);
+      console.log("TEMP TEAM");
       teamsLeaderBoard.push({
-        team,
+        team: temp_team.title,
         points: Number(points),
       });
     });
