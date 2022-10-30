@@ -117,7 +117,6 @@ const getChallengesLeaderboards = async (restApi, issues) => {
   const teamLookupTable = {};
 
   const challenges = await getChallenges();
-  console.log("Challenges are here ->");
   issues.forEach((issue, index) => {
     // For each issue, get team and issuePoints and search in dic (2) if the issue owner already exist:
     const teamLabel = issue.labels.filter((label) =>
@@ -261,15 +260,9 @@ const getChallengesLeaderboards = async (restApi, issues) => {
   sortedTeamsLeaderboardKeys.forEach((points) => {
     pointsAndTeams[points].forEach((teamNumber) => {
       const temp_team = teams.filter((team) => {
-        console.log("DENTRO DEL FILTRO pa ver");
-        console.log(
-          team.number,
-          teamNumber,
-          Number(team.number) === Number(teamNumber)
-        );
         return Number(team.number) === Number(teamNumber);
       });
-      console.log("TEMP TEAM -->", temp_team, teamNumber);
+
       teamsLeaderBoard.push({
         team: temp_team[0]?.title,
         points: Number(points),
