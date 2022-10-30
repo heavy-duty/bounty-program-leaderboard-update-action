@@ -4,12 +4,13 @@ const octokit = require("octokit");
 const fetch = require("cross-fetch");
 
 const TIME_REWARD_PERCENTAGE = 20;
+const GITHUB_APP_ID = core.getInput("github-app-id");
+const GITHUB_PRIVATE_KEY = core.getInput("github-private-key");
+const GITHUB_APP_INSTALLATION = core.getInput("github-app-installation");
+const GITHUB_OWNER = core.getInput("github-owner");
+const GITHUB_REPO = core.getInput("github-repo");
 
-const authenticateGithubApp = async (
-  GITHUB_APP_ID,
-  GITHUB_PRIVATE_KEY,
-  GITHUB_APP_INSTALLATION
-) => {
+const authenticateGithubApp = async () => {
   const app = new octokit.App({
     appId: GITHUB_APP_ID,
     privateKey: JSON.parse(GITHUB_PRIVATE_KEY),
@@ -57,7 +58,7 @@ const getChallengeBonus = (challenge, userSubmissionDate) => {
   return Math.floor(maxBonus * (progressLeft / 100));
 };
 
-const getIssuesPagingUpgrade = async (restApi, githubOwner, githubRepo) => {
+const getIssuesPagingUpgrade = async (restApi, labels) => {
   let response = null;
   const per_page = 100;
   const paginated_data = [];
@@ -66,9 +67,9 @@ const getIssuesPagingUpgrade = async (restApi, githubOwner, githubRepo) => {
 
   for (i; i < MAX_PAGES; i++) {
     response = await restApi.issues.listForRepo({
-      owner: githubOwner,
-      repo: githubRepo,
-      labels: `challenge,completed`,
+      owner: GITHUB_OWNER,
+      repo: GITHUB_REPO,
+      labels: labels,
       page: i,
       per_page: 100,
     });
@@ -96,6 +97,17 @@ const getIssuesPagingUpgrade = async (restApi, githubOwner, githubRepo) => {
   return issues.reverse();
 };
 
+const getAllTeamsIssues = async () => {
+  const teams = await restApi.issues.listForRepo({
+    owner: GITHUB_OWNER,
+    repo: GITHUB_REPO,
+    labels: `team`,
+    state: "open",
+  });
+
+  return teams.data[0];
+};
+
 const getChallengesLeaderboards = async (issues) => {
   console.log("Getting single leaderboard star!");
   // Create two dic one [pointsAndUsers] (1) `points: [user]` and the other dict two [userLookupTable] (2) `user: currentPoint` (LookUp Table)
@@ -109,7 +121,6 @@ const getChallengesLeaderboards = async (issues) => {
   console.log("Challenges are here ->");
   issues.forEach((issue, index) => {
     // For each issue, get team and issuePoints and search in dic (2) if the issue owner already exist:
-    console.log("Testing", issue);
     const teamLabel = issue.labels.filter((label) =>
       label.name.includes("team:")
     );
@@ -117,8 +128,6 @@ const getChallengesLeaderboards = async (issues) => {
 
     // for get aonly new kind of issues (all issues have now a team label, if not, skip)
     if (teamLabel.length === 0) return;
-
-    console.log("Checkpoint 1");
 
     const team = teamLabel[0].name.split(":")[1];
     // For each issue, get user and issuePoints and search in dic (2) if the issue owner already exist:
@@ -130,7 +139,7 @@ const getChallengesLeaderboards = async (issues) => {
         .filter((label) => label.name.includes("points:"))[0]
         .name.split(":")[1]
     );
-    console.log("Checkpoint 2");
+
     const challengeId = issue.labels
       .filter((label) => label.name.includes("challengeId:"))[0]
       .name.split(":")[1];
@@ -142,7 +151,7 @@ const getChallengesLeaderboards = async (issues) => {
     const currentChallenge = challenges.find(
       (challenge) => challenge.id === challengeId
     );
-    console.log("Checkpoint 3");
+
     const bonusPoints = getChallengeBonus(currentChallenge, submissionDate);
     console.log("BONUS POINTS", bonusPoints, "ISSUESP POINTS", issuesPoints);
     const totalPoints = issuesPoints + bonusPoints;
@@ -162,7 +171,7 @@ const getChallengesLeaderboards = async (issues) => {
       //return;
       userFoundInLookupTable = false;
     }
-    console.log("Checkpoint 1");
+
     /**  
       if team not exist:
       -> then
@@ -176,7 +185,7 @@ const getChallengesLeaderboards = async (issues) => {
       //return;
       teamFoundInLookupTable = false;
     }
-    console.log("Checkpoint 2");
+
     /**
        if user exist:
       -> then 
@@ -201,7 +210,6 @@ const getChallengesLeaderboards = async (issues) => {
       pointsAndUsers[newReward] = [...(pointsAndUsers[newReward] ?? []), user];
       userLookupTable[user] = newReward;
     }
-    console.log("Checkpoint 3");
 
     /**
        if team exist:
@@ -250,7 +258,8 @@ const getChallengesLeaderboards = async (issues) => {
   });
 
   leaderboardJsonString.users = usersLeaderBoard;
-
+  const teams = await getAllTeamsIssues();
+  console.log("LOS TEAMS", teams);
   // FOR TEAMS now, we create the single leaderboard, using the dict one (1)
   const sortedTeamsLeaderboardKeys = Object.keys(pointsAndTeams).sort(
     (a, b) => Number(b) - Number(a)
@@ -273,43 +282,30 @@ const getChallengesLeaderboards = async (issues) => {
 async function run() {
   try {
     console.log("Entering github action");
-    const githubAppId = core.getInput("github-app-id");
-    const githubPrivateKey = core.getInput("github-private-key");
-    const githubAppInstallation = core.getInput("github-app-installation");
-    const githubOwner = core.getInput("github-owner");
-    const githubRepo = core.getInput("github-repo");
 
-    const restApi = await authenticateGithubApp(
-      githubAppId,
-      githubPrivateKey,
-      githubAppInstallation
-    );
+    const restApi = await authenticateGithubApp();
 
-    const issues = await getIssuesPagingUpgrade(
-      restApi,
-      githubOwner,
-      githubRepo
-    );
+    const issues = await getIssuesPagingUpgrade(restApi, "challenge,completed");
     const leaderboardJsonString = await getChallengesLeaderboards(issues);
 
-    const leaderboardIssue = await restApi.issues.listForRepo({
-      owner: githubOwner,
-      repo: githubRepo,
+    const leaderboardsIssue = await restApi.issues.listForRepo({
+      owner: GITHUB_OWNER,
+      repo: GITHUB_REPO,
       labels: `core:leaderboard`,
       state: "open",
     });
 
-    if (leaderboardIssue.data.length > 0) {
+    if (leaderboardsIssue.data.length > 0) {
       await restApi.issues.update({
-        owner: githubOwner,
-        repo: githubRepo,
-        issue_number: leaderboardIssue.data[0].number,
+        owner: GITHUB_OWNER,
+        repo: GITHUB_REPO,
+        issue_number: leaderboardsIssue.data[0].number,
         body: leaderboardJsonString,
       });
     } else {
       await restApi.issues.create({
-        owner: githubOwner,
-        repo: githubRepo,
+        owner: GITHUB_OWNER,
+        repo: GITHUB_REPO,
         title: "Current Leaderboard",
         body: leaderboardJsonString,
         labels: [`core:leaderboard`],
