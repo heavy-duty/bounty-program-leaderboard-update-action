@@ -123,7 +123,6 @@ const getChallengesLeaderboards = async (restApi, issues) => {
     const teamLabel = issue.labels.filter((label) =>
       label.name.includes("team:")
     );
-    console.log("EPALEE!", teamLabel);
 
     // for get aonly new kind of issues (all issues have now a team label, if not, skip)
     if (teamLabel.length === 0) return;
@@ -145,17 +144,12 @@ const getChallengesLeaderboards = async (restApi, issues) => {
 
     const submissionDate = issue.created_at;
 
-    console.log("CHALLENGE ID", challengeId, "User Submission", submissionDate);
-
     const currentChallenge = challenges.find(
       (challenge) => challenge.id === challengeId
     );
 
     const bonusPoints = getChallengeBonus(currentChallenge, submissionDate);
-    console.log("BONUS POINTS", bonusPoints, "ISSUESP POINTS", issuesPoints);
     const totalPoints = issuesPoints + bonusPoints;
-
-    console.log("TOTAL POINTS ", totalPoints);
 
     /**  
       if user not exist:
@@ -233,11 +227,10 @@ const getChallengesLeaderboards = async (restApi, issues) => {
       pointsAndTeams[newReward] = [...(pointsAndTeams[newReward] ?? []), team];
       teamLookupTable[team] = newReward;
     }
-    console.log("Checkpoint 4");
 
     return;
   });
-  console.log("CHECK 0");
+
   let leaderboardJsonString = {
     users: null,
     teams: null,
@@ -255,10 +248,9 @@ const getChallengesLeaderboards = async (restApi, issues) => {
       });
     });
   });
-  console.log("CHECK 1");
 
   leaderboardJsonString.users = usersLeaderBoard;
-  console.log("CHECK 2");
+
   const teams = await getAllTeamsIssues(restApi);
   console.log("LOS TEAMS", teams);
   // FOR TEAMS now, we create the single leaderboard, using the dict one (1)
@@ -269,7 +261,7 @@ const getChallengesLeaderboards = async (restApi, issues) => {
   sortedTeamsLeaderboardKeys.forEach((points) => {
     pointsAndTeams[points].forEach((teamNumber) => {
       const temp_team = teams.filter((team) => team.number === teamNumber);
-      console.log("TEMP TEAM");
+      console.log("TEMP TEAM", temp_team, teamNumber);
       teamsLeaderBoard.push({
         team: temp_team.title,
         points: Number(points),
