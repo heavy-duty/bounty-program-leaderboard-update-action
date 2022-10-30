@@ -252,7 +252,7 @@ const getChallengesLeaderboards = async (restApi, issues) => {
   leaderboardJsonString.users = usersLeaderBoard;
 
   const teams = await getAllTeamsIssues(restApi);
-  console.log("LOS TEAMS ABAJO");
+  console.log("LOS TEAMS ABAJO 2");
   // FOR TEAMS now, we create the single leaderboard, using the dict one (1)
   const sortedTeamsLeaderboardKeys = Object.keys(pointsAndTeams).sort(
     (a, b) => Number(b) - Number(a)
@@ -260,8 +260,12 @@ const getChallengesLeaderboards = async (restApi, issues) => {
   const teamsLeaderBoard = [];
   sortedTeamsLeaderboardKeys.forEach((points) => {
     pointsAndTeams[points].forEach((teamNumber) => {
-      const temp_team = teams.find((team) => team.number === teamNumber);
-      console.log("TEMP TEAM", temp_team, teamNumber, team);
+      const temp_team = teams.filter((team) => {
+        console.log("DENTRO DEL FILTRO");
+        console.log(team, teamNumber);
+        return team.number === teamNumber;
+      });
+      console.log("TEMP TEAM", temp_team, teamNumber);
       teamsLeaderBoard.push({
         team: temp_team[0]?.title,
         points: Number(points),
