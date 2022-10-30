@@ -1,5 +1,4 @@
 const core = require("@actions/core");
-const github = require("@actions/github");
 const octokit = require("octokit");
 const fetch = require("cross-fetch");
 
@@ -97,7 +96,7 @@ const getIssuesPagingUpgrade = async (restApi, labels) => {
   return issues.reverse();
 };
 
-const getAllTeamsIssues = async () => {
+const getAllTeamsIssues = async (restApi) => {
   const teams = await restApi.issues.listForRepo({
     owner: GITHUB_OWNER,
     repo: GITHUB_REPO,
@@ -108,7 +107,7 @@ const getAllTeamsIssues = async () => {
   return teams.data[0];
 };
 
-const getChallengesLeaderboards = async (issues) => {
+const getChallengesLeaderboards = async (restApi, issues) => {
   console.log("Getting single leaderboard star!");
   // Create two dic one [pointsAndUsers] (1) `points: [user]` and the other dict two [userLookupTable] (2) `user: currentPoint` (LookUp Table)
   const pointsAndUsers = {};
@@ -260,7 +259,7 @@ const getChallengesLeaderboards = async (issues) => {
 
   leaderboardJsonString.users = usersLeaderBoard;
   console.log("CHECK 2");
-  const teams = await getAllTeamsIssues();
+  const teams = await getAllTeamsIssues(restApi);
   console.log("LOS TEAMS", teams);
   // FOR TEAMS now, we create the single leaderboard, using the dict one (1)
   const sortedTeamsLeaderboardKeys = Object.keys(pointsAndTeams).sort(
@@ -284,11 +283,13 @@ const getChallengesLeaderboards = async (issues) => {
 async function run() {
   try {
     console.log("Entering github action");
-
     const restApi = await authenticateGithubApp();
 
     const issues = await getIssuesPagingUpgrade(restApi, "challenge,completed");
-    const leaderboardJsonString = await getChallengesLeaderboards(issues);
+    const leaderboardJsonString = await getChallengesLeaderboards(
+      restApi,
+      issues
+    );
 
     const leaderboardsIssue = await restApi.issues.listForRepo({
       owner: GITHUB_OWNER,
