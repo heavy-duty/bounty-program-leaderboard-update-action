@@ -156,7 +156,7 @@ const getChallengesLeaderboards = async (issues) => {
     console.log("BONUS POINTS", bonusPoints, "ISSUESP POINTS", issuesPoints);
     const totalPoints = issuesPoints + bonusPoints;
 
-    console.log("TOTAL POINTS ", bonusPoints);
+    console.log("TOTAL POINTS ", totalPoints);
 
     /**  
       if user not exist:
@@ -238,7 +238,7 @@ const getChallengesLeaderboards = async (issues) => {
 
     return;
   });
-
+  console.log("CHECK 0");
   let leaderboardJsonString = {
     users: null,
     teams: null,
@@ -256,8 +256,10 @@ const getChallengesLeaderboards = async (issues) => {
       });
     });
   });
+  console.log("CHECK 1");
 
   leaderboardJsonString.users = usersLeaderBoard;
+  console.log("CHECK 2");
   const teams = await getAllTeamsIssues();
   console.log("LOS TEAMS", teams);
   // FOR TEAMS now, we create the single leaderboard, using the dict one (1)
