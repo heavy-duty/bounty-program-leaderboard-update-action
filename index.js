@@ -113,8 +113,8 @@ const getChallengesLeaderboards = async (restApi, issues) => {
   const pointsAndUsers = {};
   const userLookupTable = {};
   // Create two dic one [pointsAndTeams] (1) `points: [team]` and the other dict two [teamLookupTable] (2) `team: currentPoint` (LookUp Table)
-  const pointsAndTeams = {};
-  const teamLookupTable = {};
+  // const pointsAndTeams = {};
+  // const teamLookupTable = {};
 
   const challenges = await getChallenges();
   issues.forEach((issue, index) => {
@@ -170,13 +170,13 @@ const getChallengesLeaderboards = async (restApi, issues) => {
       ---- we add a new entry at dict two [teamLookupTable] (2) team: issuesPoints
       ---- we add a new entry at dic one [pointsAndTeams] (1) using the issuesPoints to find the spot // END
     */
-    let teamFoundInLookupTable = true;
-    if (!teamLookupTable[team]) {
-      teamLookupTable[team] = totalPoints;
-      pointsAndTeams[totalPoints] = [team];
-      //return;
-      teamFoundInLookupTable = false;
-    }
+    // let teamFoundInLookupTable = true;
+    // if (!teamLookupTable[team]) {
+    //   teamLookupTable[team] = totalPoints;
+    //   pointsAndTeams[totalPoints] = [team];
+    //   //return;
+    //   teamFoundInLookupTable = false;
+    // }
 
     /**
        if user exist:
@@ -211,21 +211,21 @@ const getChallengesLeaderboards = async (restApi, issues) => {
       ---- add new entry (or update the current one) using the new team points to the dic one [pointsAndTeams] (1)
       ---- update the team current points at dict two [teamLookupTable] (2) // END
     */
-    if (teamFoundInLookupTable) {
-      const teamCurrentPoints = teamLookupTable[team];
-      const teamXRewardIndex = pointsAndTeams[teamCurrentPoints].indexOf(team);
+    // if (teamFoundInLookupTable) {
+    //   const teamCurrentPoints = teamLookupTable[team];
+    //   const teamXRewardIndex = pointsAndTeams[teamCurrentPoints].indexOf(team);
 
-      pointsAndTeams[teamCurrentPoints].splice(teamXRewardIndex, 1);
+    //   pointsAndTeams[teamCurrentPoints].splice(teamXRewardIndex, 1);
 
-      // if the points X is empty (no team at it) with delete that entry
-      if (pointsAndTeams[teamCurrentPoints].length === 0)
-        delete pointsAndTeams[teamCurrentPoints];
+    //   // if the points X is empty (no team at it) with delete that entry
+    //   if (pointsAndTeams[teamCurrentPoints].length === 0)
+    //     delete pointsAndTeams[teamCurrentPoints];
 
-      const newReward = teamCurrentPoints + totalPoints;
+    //   const newReward = teamCurrentPoints + totalPoints;
 
-      pointsAndTeams[newReward] = [...(pointsAndTeams[newReward] ?? []), team];
-      teamLookupTable[team] = newReward;
-    }
+    //   pointsAndTeams[newReward] = [...(pointsAndTeams[newReward] ?? []), team];
+    //   teamLookupTable[team] = newReward;
+    // }
 
     return;
   });
@@ -249,28 +249,29 @@ const getChallengesLeaderboards = async (restApi, issues) => {
   });
 
   leaderboardJsonString.users = usersLeaderBoard;
+  leaderboardJsonString.teams = null;
 
-  const teams = await getAllTeamsIssues(restApi);
+  // const teams = await getAllTeamsIssues(restApi);
 
   // FOR TEAMS now, we create the single leaderboard, using the dict one (1)
-  const sortedTeamsLeaderboardKeys = Object.keys(pointsAndTeams).sort(
-    (a, b) => Number(b) - Number(a)
-  );
-  const teamsLeaderBoard = [];
-  sortedTeamsLeaderboardKeys.forEach((points) => {
-    pointsAndTeams[points].forEach((teamNumber) => {
-      const temp_team = teams.filter((team) => {
-        return Number(team.number) === Number(teamNumber);
-      });
+  // const sortedTeamsLeaderboardKeys = Object.keys(pointsAndTeams).sort(
+  //   (a, b) => Number(b) - Number(a)
+  // );
+  // const teamsLeaderBoard = [];
+  // sortedTeamsLeaderboardKeys.forEach((points) => {
+  //   pointsAndTeams[points].forEach((teamNumber) => {
+  //     const temp_team = teams.filter((team) => {
+  //       return Number(team.number) === Number(teamNumber);
+  //     });
 
-      teamsLeaderBoard.push({
-        team: temp_team[0]?.title,
-        points: Number(points),
-      });
-    });
-  });
+  //     teamsLeaderBoard.push({
+  //       team: temp_team[0]?.title,
+  //       points: Number(points),
+  //     });
+  //   });
+  // });
 
-  leaderboardJsonString.teams = teamsLeaderBoard;
+  // leaderboardJsonString.teams = teamsLeaderBoard;
 
   return JSON.stringify(leaderboardJsonString);
 };
