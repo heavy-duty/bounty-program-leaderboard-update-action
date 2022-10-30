@@ -262,8 +262,12 @@ const getChallengesLeaderboards = async (restApi, issues) => {
     pointsAndTeams[points].forEach((teamNumber) => {
       const temp_team = teams.filter((team) => {
         console.log("DENTRO DEL FILTRO pa ver");
-        console.log(team.number, teamNumber, team.number === teamNumber);
-        return team.number === teamNumber;
+        console.log(
+          team.number,
+          teamNumber,
+          number(team.number) === number(teamNumber)
+        );
+        return number(team.number) === number(teamNumber);
       });
       console.log("TEMP TEAM -->", temp_team, teamNumber);
       teamsLeaderBoard.push({
