@@ -119,14 +119,14 @@ const getChallengesLeaderboards = async (restApi, issues) => {
   const challenges = await getChallenges();
   issues.forEach((issue, index) => {
     // For each issue, get team and issuePoints and search in dic (2) if the issue owner already exist:
-    const teamLabel = issue.labels.filter((label) =>
-      label.name.includes("team:")
-    );
+    // const teamLabel = issue.labels.filter((label) =>
+    //   label.name.includes("team:")
+    // );
 
     // for get aonly new kind of issues (all issues have now a team label, if not, skip)
-    if (teamLabel.length === 0) return;
+    // if (teamLabel.length === 0) return;
 
-    const team = teamLabel[0].name.split(":")[1];
+    // const team = teamLabel[0].name.split(":")[1];
     // For each issue, get user and issuePoints and search in dic (2) if the issue owner already exist:
     const user = issue.labels
       .filter((label) => label.name.includes("user:"))[0]
