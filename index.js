@@ -44,7 +44,6 @@ const getProgress = (min, max, value) => {
 };
 
 const getChallengeBonus = (challenge, userSubmissionDate) => {
-  console.log("ENTER 1", challenge, userSubmissionDate);
   const maxBonus = challenge.rewardValue * (TIME_REWARD_PERCENTAGE / 100);
   const progressLeft =
     100 -
@@ -117,6 +116,7 @@ const getChallengesLeaderboards = async (restApi, issues) => {
   // const teamLookupTable = {};
 
   const challenges = await getChallenges();
+  console.log("Issues", issues);
   issues.forEach((issue, index) => {
     // For each issue, get team and issuePoints and search in dic (2) if the issue owner already exist:
     // const teamLabel = issue.labels.filter((label) =>
@@ -153,7 +153,7 @@ const getChallengesLeaderboards = async (restApi, issues) => {
     /**  
       if user not exist:
       -> then
-      
+
       ---- we add a new entry at dict two [userLookupTable] (2) user: issuesPoints
       ---- we add a new entry at dic one [pointsAndUsers] (1) using the issuesPoints to find the spot // END
     */
@@ -227,8 +227,6 @@ const getChallengesLeaderboards = async (restApi, issues) => {
     //   pointsAndTeams[newReward] = [...(pointsAndTeams[newReward] ?? []), team];
     //   teamLookupTable[team] = newReward;
     // }
-
-    return;
   });
 
   let leaderboardJsonString = {

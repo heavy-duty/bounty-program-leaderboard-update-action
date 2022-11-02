@@ -1,6 +1,6 @@
 {
   "name": "bounty-program-leaderboard-update-action",
-  "version": "1.4.61",
+  "version": "1.4.62",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
