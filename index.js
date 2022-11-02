@@ -149,7 +149,7 @@ const getChallengesLeaderboards = async (restApi, issues) => {
 
     const bonusPoints = getChallengeBonus(currentChallenge, submissionDate);
     const totalPoints = issuesPoints + bonusPoints;
-
+      console.log("testing",user, issuesPoints)
     /**  
       if user not exist:
       -> then
