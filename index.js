@@ -160,7 +160,7 @@ const getChallengesLeaderboards = async (restApi, issues) => {
     let userFoundInLookupTable = true;
     if (!userLookupTable[user]) {
       userLookupTable[user] = totalPoints;
-      pointsAndUsers[totalPoints] = [...(pointsAndUsers[newReward] ?? []), user];
+      pointsAndUsers[totalPoints] = [...(pointsAndUsers[totalPoints] ?? []), user];
       //return;
       userFoundInLookupTable = false;
     }
