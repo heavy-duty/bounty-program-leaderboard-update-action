@@ -228,7 +228,7 @@ const getChallengesLeaderboards = async (restApi, issues) => {
     //   teamLookupTable[team] = newReward;
     // }
   });
-
+  console.log("LOOKING INSIDE", pointsAndUsers, userLookupTable)
   let leaderboardJsonString = {
     users: null,
     teams: null,
