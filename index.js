@@ -160,7 +160,7 @@ const getChallengesLeaderboards = async (restApi, issues) => {
     let userFoundInLookupTable = true;
     if (!userLookupTable[user]) {
       userLookupTable[user] = totalPoints;
-      pointsAndUsers[totalPoints] = [user];
+      pointsAndUsers[totalPoints] = [...pointsAndUsers[totalPoints], user];
       //return;
       userFoundInLookupTable = false;
     }
@@ -192,12 +192,14 @@ const getChallengesLeaderboards = async (restApi, issues) => {
       const userCurrentPoints = userLookupTable[user];
       const usersXRewardIndex = pointsAndUsers[userCurrentPoints].indexOf(user);
 
+      // remove the current user from the key it belongs
       pointsAndUsers[userCurrentPoints].splice(usersXRewardIndex, 1);
 
       // if the points X is empty (no user at it) with delete that entry
       if (pointsAndUsers[userCurrentPoints].length === 0)
         delete pointsAndUsers[userCurrentPoints];
 
+      // getting new reward, adding the bonus points to the issues points
       const newReward = userCurrentPoints + totalPoints;
 
       pointsAndUsers[newReward] = [...(pointsAndUsers[newReward] ?? []), user];
