@@ -153,6 +153,7 @@ const getChallengesLeaderboards = async (restApi, issues) => {
     /**  
       if user not exist:
       -> then
+      
       ---- we add a new entry at dict two [userLookupTable] (2) user: issuesPoints
       ---- we add a new entry at dic one [pointsAndUsers] (1) using the issuesPoints to find the spot // END
     */
