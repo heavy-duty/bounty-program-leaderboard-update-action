@@ -149,7 +149,8 @@ const getChallengesLeaderboards = async (restApi, issues) => {
 
     const bonusPoints = getChallengeBonus(currentChallenge, submissionDate);
     const totalPoints = issuesPoints + bonusPoints;
-      console.log("testing",user, issuesPoints)
+    console.log("testing",user, issuesPoints);
+      
     /**  
       if user not exist:
       -> then
@@ -229,6 +230,9 @@ const getChallengesLeaderboards = async (restApi, issues) => {
     //   pointsAndTeams[newReward] = [...(pointsAndTeams[newReward] ?? []), team];
     //   teamLookupTable[team] = newReward;
     // }
+    console.log("1-",pointsAndUsers);
+    console.log("2-",userLookupTable);
+    console.log("FINISH");
   });
   console.log("LOOKING INSIDE", pointsAndUsers, userLookupTable)
   let leaderboardJsonString = {
@@ -312,7 +316,7 @@ async function run() {
       });
     }
 
-    console.log("JSON 26 -->", leaderboardJsonString);
+    console.log("JSON 27 -->", leaderboardJsonString);
   } catch (error) {
     core.setFailed("QUE PASO??", error);
   }
