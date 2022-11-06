@@ -8,6 +8,7 @@ const GITHUB_PRIVATE_KEY = core.getInput("github-private-key");
 const GITHUB_APP_INSTALLATION = core.getInput("github-app-installation");
 const GITHUB_OWNER = core.getInput("github-owner");
 const GITHUB_REPO = core.getInput("github-repo");
+const CHALLENGES_API_URL = core.getInput("challenge-api");
 
 const authenticateGithubApp = async () => {
   const app = new octokit.App({
@@ -21,7 +22,7 @@ const authenticateGithubApp = async () => {
 
 const getChallenges = async () => {
   const challenges = await fetch(
-    "https://india.heavyduty.builders/api/challenges"
+    CHALLENGES_API_URL
   );
 
   const data = await challenges.json();
