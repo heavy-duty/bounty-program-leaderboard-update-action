@@ -21,7 +21,7 @@ const authenticateGithubApp = async () => {
 
 const getChallenges = async () => {
   const challenges = await fetch(
-    "https://lisbon.heavyduty.builders/api/challenges"
+    "https://india.heavyduty.builders/api/challenges"
   );
 
   const data = await challenges.json();
