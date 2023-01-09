@@ -59,12 +59,13 @@ const getChallengeBonus = (challenge, userSubmissionDate) => {
 
 const getIssuesPagingUpgrade = async (restApi, labels) => {
   let response = null;
-  const per_page = 100;
+  const per_page = 1000;
   const paginated_data = [];
-  const MAX_PAGES = 20;
+  const MAX_PAGES = 40;
   let i = 1;
 
   for (i; i < MAX_PAGES; i++) {
+    console.log("number ", i);
     response = await restApi.issues.listForRepo({
       owner: GITHUB_OWNER,
       repo: GITHUB_REPO,
@@ -274,7 +275,7 @@ const getChallengesLeaderboards = async (restApi, issues) => {
 
 async function run() {
   try {
-    console.log("Entering github action");
+    console.log("Entering github action !!! 1");
     console.log("testing");
     console.log({GITHUB_APP_ID,GITHUB_PRIVATE_KEY,GITHUB_APP_INSTALLATION,GITHUB_OWNER,GITHUB_REPO,CHALLENGES_API_URL})
     const restApi = await authenticateGithubApp();
