@@ -61,7 +61,7 @@ const getIssuesPagingUpgrade = async (restApi, labels) => {
   let response = null;
   const per_page = 100;
   const paginated_data = [];
-  const MAX_PAGES = 10;
+  const MAX_PAGES = 20;
   let i = 1;
 
   for (i; i < MAX_PAGES; i++) {
