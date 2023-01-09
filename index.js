@@ -288,6 +288,8 @@ const getChallengesLeaderboards = async (restApi, issues) => {
 async function run() {
   try {
     console.log("Entering github action");
+    console.log("testing");
+    console.log({GITHUB_APP_ID,GITHUB_PRIVATE_KEY,GITHUB_APP_INSTALLATION,GITHUB_OWNER,GITHUB_REPO,CHALLENGES_API_URL})
     const restApi = await authenticateGithubApp();
 
     const issues = await getIssuesPagingUpgrade(restApi, "challenge,completed");
