@@ -117,9 +117,7 @@ const getChallengesLeaderboards = async (restApi, issues) => {
   // const teamLookupTable = {};
 
   const challenges = await getChallenges();
-  console.log("Issues", issues);
   issues.forEach((issue, index) => {
-    console.log("Iterating...");
     // For each issue, get team and issuePoints and search in dic (2) if the issue owner already exist:
     // const teamLabel = issue.labels.filter((label) =>
     //   label.name.includes("team:")
@@ -133,26 +131,20 @@ const getChallengesLeaderboards = async (restApi, issues) => {
     const user = issue.labels
       .filter((label) => label.name.includes("user:"))[0]
       .name.split(":")[1];
-    console.log("user",user);
     const issuesPoints = Number(
       issue.labels
         .filter((label) => label.name.includes("points:"))[0]
         .name.split(":")[1]
     );
-    console.log("points",issuesPoints);
     const challengeId = issue.labels
       .filter((label) => label.name.includes("challengeId:"))[0]
       .name.split(":")[1];
-    console.log("challengeId",challengeId);
     const submissionDate = issue.created_at;
-    console.log("submissionDate",challengeId);
     const currentChallenge = challenges.find(
       (challenge) => challenge.id === challengeId
     );
-    console.log("current challenge",currentChallenge);
     const bonusPoints = getChallengeBonus(currentChallenge, submissionDate);
     const totalPoints = issuesPoints + bonusPoints;
-    console.log("testing",user, issuesPoints);
       
     /**  
       if user not exist:
@@ -233,12 +225,7 @@ const getChallengesLeaderboards = async (restApi, issues) => {
     //   pointsAndTeams[newReward] = [...(pointsAndTeams[newReward] ?? []), team];
     //   teamLookupTable[team] = newReward;
     // }
-    console.log("1-",pointsAndUsers);
-    console.log("2-",userLookupTable);
-    console.log("FINISH");
-    console.log("----------");
   });
-  console.log("LOOKING INSIDE", pointsAndUsers, userLookupTable)
   let leaderboardJsonString = {
     users: null,
     teams: null,
@@ -293,6 +280,7 @@ async function run() {
     const restApi = await authenticateGithubApp();
 
     const issues = await getIssuesPagingUpgrade(restApi, "challenge,completed");
+    console.log("NUMBER OF ISSUES", issues.length, issues);
     const leaderboardJsonString = await getChallengesLeaderboards(
       restApi,
       issues
@@ -322,7 +310,7 @@ async function run() {
       });
     }
 
-    console.log("JSON 27 -->", leaderboardJsonString);
+    console.log("JSON -->", leaderboardJsonString);
   } catch (error) {
     core.setFailed("QUE PASO??", error);
   }
