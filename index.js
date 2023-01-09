@@ -60,7 +60,7 @@ const getIssuesPagingUpgrade = async (restApi, labels) => {
   let response = null;
   const per_page = 250;
   const paginated_data = [];
-  const MAX_PAGES = 40;
+  const MAX_PAGES = 30;
   let i = 1;
 
   for (i; i < MAX_PAGES; i++) {
@@ -70,7 +70,7 @@ const getIssuesPagingUpgrade = async (restApi, labels) => {
       repo: GITHUB_REPO,
       labels: labels,
       page: MAX_PAGES,
-      per_page: 100,
+      per_page: 10,
     });
 
     if (response.data === null || response.data.length === 0) {
@@ -84,6 +84,7 @@ const getIssuesPagingUpgrade = async (restApi, labels) => {
   }
 
   if (paginated_data.length == 0) {
+    console.log(response);
     console.log(`i got nuthn for you..`);
     return [];
   }
