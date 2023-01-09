@@ -31,7 +31,6 @@ const getChallenges = async () => {
 };
 
 const getProgress = (min, max, value) => {
-  console.log("ENTER 2", min, max, value);
   if (value < min) {
     return 0;
   } else if (value < max) {
@@ -59,18 +58,18 @@ const getChallengeBonus = (challenge, userSubmissionDate) => {
 
 const getIssuesPagingUpgrade = async (restApi, labels) => {
   let response = null;
-  const per_page = 1000;
+  const per_page = 250;
   const paginated_data = [];
   const MAX_PAGES = 40;
   let i = 1;
 
   for (i; i < MAX_PAGES; i++) {
-    console.log("number ", i);
+    console.log("Page ", i);
     response = await restApi.issues.listForRepo({
       owner: GITHUB_OWNER,
       repo: GITHUB_REPO,
       labels: labels,
-      page: i,
+      page: MAX_PAGES,
       per_page: 100,
     });
 
@@ -109,7 +108,6 @@ const getAllTeamsIssues = async (restApi) => {
 };
 
 const getChallengesLeaderboards = async (restApi, issues) => {
-  console.log("Getting single leaderboard star!");
   // Create two dic one [pointsAndUsers] (1) `points: [user]` and the other dict two [userLookupTable] (2) `user: currentPoint` (LookUp Table)
   const pointsAndUsers = {};
   const userLookupTable = {};
