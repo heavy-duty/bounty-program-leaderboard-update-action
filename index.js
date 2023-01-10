@@ -70,7 +70,7 @@ const getIssuesPagingUpgrade = async (restApi, labels) => {
       repo: GITHUB_REPO,
       labels: labels,
       page: i,
-      per_page: MAX_PAGES,
+      per_page: 100,
     });
 
     if (response.data === null || response.data.length === 0) {
