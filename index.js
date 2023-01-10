@@ -58,9 +58,9 @@ const getChallengeBonus = (challenge, userSubmissionDate) => {
 
 const getIssuesPagingUpgrade = async (restApi, labels) => {
   let response = null;
-  const per_page = 250;
+  const per_page = 100;
   const paginated_data = [];
-  const MAX_PAGES = 30;
+  const MAX_PAGES = 10;
   let i = 1;
 
   for (i; i < MAX_PAGES; i++) {
@@ -78,9 +78,6 @@ const getIssuesPagingUpgrade = async (restApi, labels) => {
     }
 
     paginated_data.push(...response.data);
-    if (response.data.length < i * per_page) {
-      break;
-    }
   }
 
   if (paginated_data.length == 0) {
